@@ -8,9 +8,9 @@ namespace Routine.Api.Services
     {
         #region ctor
         private readonly RoutineDbContext _context;
-        public CompanyRepository(DbContext context)
+        public CompanyRepository(RoutineDbContext context)
         {
-            _context = (RoutineDbContext?)context ?? throw new ArgumentNullException(nameof(context));
+            _context = context;
         }
         #endregion
 
