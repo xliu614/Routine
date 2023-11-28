@@ -23,6 +23,7 @@ namespace Routine.Api
                     //if want to setup the default formater as for xml
                     //setup.OutputFormatters.Insert(0, new XmlDataContractSerializerOutputFormatter());
                 }).AddXmlDataContractSerializerFormatters(); // this is to add xml formatter for both input and output formatters
+            builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             builder.Services.AddTransient<ICompanyRepository, CompanyRepository>();
             builder.Services.AddDbContext<RoutineDbContext>(option =>
             {

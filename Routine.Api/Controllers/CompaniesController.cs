@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Routine.Api.Models;
 using Routine.Api.Services;
+using System.Collections.Generic;
 
 namespace Routine.Api.Controllers
 {
@@ -12,9 +14,12 @@ namespace Routine.Api.Controllers
     public class CompaniesController:ControllerBase
     {
         private readonly ICompanyRepository _companyRepository;
-        public CompaniesController(ICompanyRepository companyRepository)
+        private readonly IMapper _mapper;
+
+        public CompaniesController(ICompanyRepository companyRepository, IMapper mapper)
         {
             _companyRepository = companyRepository;
+            _mapper = mapper;
         }
         /// <summary>
         /// Get companies list
@@ -25,19 +30,13 @@ namespace Routine.Api.Controllers
         [HttpGet]        
         public async Task<ActionResult<IEnumerable<CompanyDto>>> GetCompanies() {
             var companies = await _companyRepository.GetCompaniesAsync();
-            var companyDtos = new List<CompanyDto>();
-            foreach (var company in companies) {
-                companyDtos.Add(new CompanyDto
-                {
-                    Id = company.Id,
-                    Name = company.Name,
-                });
-            }
-            return companyDtos;
+            var companyDtos = _mapper.Map<IEnumerable<CompanyDto>>(companies);
+            
+            return Ok(companyDtos);
         }
 
         [HttpGet("{companyId}")]
-        public async Task<IActionResult> GetCompanyById(Guid companyId) //api/companies/123
+        public async Task<ActionResult<CompanyDto>> GetCompanyById(Guid companyId) //api/companies/123
         {
             //if doing judgement for exist like this, then after exist is true if someone remove the resource then there's a risk of actual not founding the content
             //var exist = await _companyRepository.CompanyExistsAsync(companyId);
@@ -48,7 +47,7 @@ namespace Routine.Api.Controllers
             if (company == null)
                 return NotFound();
 
-            return Ok(company);
+            return Ok(_mapper.Map<CompanyDto>(company));
         }
 
 
