@@ -1,6 +1,7 @@
 using Routine.Api.Data;
 using Routine.Api.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc.Formatters;
 
 namespace Routine.Api
 {
@@ -12,8 +13,16 @@ namespace Routine.Api
 
 
             // Add services to the container.
-            builder.Services.AddRazorPages();
-            //builder.Services.AddControllers();
+            //builder.Services.AddRazorPages();
+            builder.Services.AddControllers(
+                setup => { setup.ReturnHttpNotAcceptable = true;
+                    //suppport XML output
+                    //OutputFormatters is a collection, and by default it supports json, so one can add for XML, now we have both json and xml
+                    //setup.OutputFormatters.Add(new XmlDataContractSerializerOutputFormatter());
+                    
+                    //if want to setup the default formater as for xml
+                    //setup.OutputFormatters.Insert(0, new XmlDataContractSerializerOutputFormatter());
+                }).AddXmlDataContractSerializerFormatters(); // this is to add xml formatter for both input and output formatters
             builder.Services.AddTransient<ICompanyRepository, CompanyRepository>();
             builder.Services.AddDbContext<RoutineDbContext>(option =>
             {
@@ -61,7 +70,7 @@ namespace Routine.Api
             //    endpoints.MapControllers(); //Routes for my API controllers
             //});
 
-            app.MapRazorPages();
+            //app.MapRazorPages();
 
             app.Run();
         }
