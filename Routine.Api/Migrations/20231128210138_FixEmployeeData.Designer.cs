@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Routine.Api.Data;
 
@@ -10,9 +11,11 @@ using Routine.Api.Data;
 namespace Routine.Api.Migrations
 {
     [DbContext(typeof(RoutineDbContext))]
-    partial class RoutineDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231128210138_FixEmployeeData")]
+    partial class FixEmployeeData
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.13");
@@ -159,13 +162,11 @@ namespace Routine.Api.Migrations
 
             modelBuilder.Entity("Routine.Api.Entities.Employee", b =>
                 {
-                    b.HasOne("Routine.Api.Entities.Company", "Company")
+                    b.HasOne("Routine.Api.Entities.Company", null)
                         .WithMany("Employees")
                         .HasForeignKey("CompanyId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Company");
                 });
 
             modelBuilder.Entity("Routine.Api.Entities.Company", b =>
