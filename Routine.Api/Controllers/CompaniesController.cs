@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Routine.Api.Models;
 using Routine.Api.Services;
 
 namespace Routine.Api.Controllers
@@ -15,10 +16,24 @@ namespace Routine.Api.Controllers
         {
             _companyRepository = companyRepository;
         }
-        [HttpGet]
-        public async Task<IActionResult> GetCompanies() {
+        /// <summary>
+        /// Get companies list
+        /// If you know about the specific return type, then use ActionResult is better than IActionResult
+        /// Also, if using ActionResult, then you can return either Ok wrapped result or direct result
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]        
+        public async Task<ActionResult<IEnumerable<CompanyDto>>> GetCompanies() {
             var companies = await _companyRepository.GetCompaniesAsync();
-            return Ok(companies);
+            var companyDtos = new List<CompanyDto>();
+            foreach (var company in companies) {
+                companyDtos.Add(new CompanyDto
+                {
+                    Id = company.Id,
+                    Name = company.Name,
+                });
+            }
+            return companyDtos;
         }
 
         [HttpGet("{companyId}")]
