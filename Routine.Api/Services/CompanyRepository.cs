@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Routine.Api.Data;
+using Routine.Api.DtoParems;
 using Routine.Api.Entities;
+using System.Linq;
 
 namespace Routine.Api.Services
 {
@@ -19,9 +21,29 @@ namespace Routine.Api.Services
         /// Get Company list
         /// </summary>
         /// <returns></returns>
-        public async Task<IEnumerable<Company>> GetCompaniesAsync()
+        public async Task<IEnumerable<Company>> GetCompaniesAsync(CompanyDtoParameters parameters)
         {
-            return await _context.Companies.ToListAsync();
+            if (parameters == null) {
+                throw new ArgumentNullException(nameof(parameters));
+            }
+
+            if (string.IsNullOrWhiteSpace(parameters.CompanyName) && string.IsNullOrWhiteSpace(parameters.SearchTerm)) {
+                return await _context.Companies.ToListAsync();
+            }
+
+            var query = _context.Companies as IQueryable<Company>;
+
+            if (!string.IsNullOrWhiteSpace(parameters.CompanyName)) {
+                parameters.CompanyName = parameters.CompanyName.Trim();
+                query = query.Where(c => c.Name == parameters.CompanyName);
+            }
+
+            if (!string.IsNullOrWhiteSpace(parameters.SearchTerm)) {
+                parameters.SearchTerm = parameters.SearchTerm.Trim();
+                query = query.Where(c => c.Name.Contains(parameters.SearchTerm) || c.Introduction.Contains(parameters.SearchTerm));
+            }
+                
+            return await query.ToListAsync();
         }
         /// <summary>
         /// Get a single company
@@ -58,8 +80,15 @@ namespace Routine.Api.Services
             if (company == null)
                 throw new ArgumentNullException(nameof(company));
             company.Id = Guid.NewGuid();
-            foreach (var employee in company.Employees) {
-                employee.Id = Guid.NewGuid();
+
+            //when create a company intially, employee can be null
+            //only when employee is not null, do the below
+            if (company.Employees != null)
+            {
+                foreach (var employee in company.Employees)
+                {
+                    employee.Id = Guid.NewGuid();
+                }
             }
             _context.Companies.Add(company);
         }

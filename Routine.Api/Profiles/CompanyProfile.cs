@@ -9,6 +9,7 @@ namespace Routine.Api.Profiles
         public CompanyProfile()
         {
             CreateMap<Company, CompanyDto>().ForMember(dest => dest.CompanyName, opt => opt.MapFrom(src => src.Name));
+            CreateMap<CompanyAddDto, Company>();
         }
     }
 }

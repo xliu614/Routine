@@ -1,4 +1,5 @@
-﻿using Routine.Api.Entities;
+﻿using Routine.Api.DtoParems;
+using Routine.Api.Entities;
 
 namespace Routine.Api.Services
 {
@@ -8,7 +9,7 @@ namespace Routine.Api.Services
         /// Get the list of the companies
         /// </summary>
         /// <returns></returns>
-        Task<IEnumerable<Company>> GetCompaniesAsync();
+        Task<IEnumerable<Company>> GetCompaniesAsync(CompanyDtoParameters parameters);
         /// <summary>
         /// Get the list of the companies by the list of Guid
         /// </summary>
