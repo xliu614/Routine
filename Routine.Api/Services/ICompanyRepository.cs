@@ -48,7 +48,7 @@ namespace Routine.Api.Services
         /// </summary>
         /// <param name="companyId"></param>
         /// <returns></returns>
-        Task<IEnumerable<Employee>> GetEmployeesAsync(Guid companyId);
+        Task<IEnumerable<Employee>> GetEmployeesAsync(Guid companyId, string? genderDisplay, string? q);
         /// <summary>
         /// Get a specific employee
         /// </summary>

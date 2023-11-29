@@ -18,17 +18,19 @@ namespace Routine.Api.Controllers
 
         public CompaniesController(ICompanyRepository companyRepository, IMapper mapper)
         {
-            _companyRepository = companyRepository;
-            _mapper = mapper;
+            _companyRepository = companyRepository ?? throw new ArgumentNullException(nameof(companyRepository));
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
         /// <summary>
         /// Get companies list
         /// If you know about the specific return type, then use ActionResult is better than IActionResult
         /// Also, if using ActionResult, then you can return either Ok wrapped result or direct result
         /// </summary>
-        /// <returns></returns>
-        [HttpGet]        
+        /// <returns>If choose HttpHead then the there's no body in the response</returns>
+        [HttpGet]
+        [HttpHead]
         public async Task<ActionResult<IEnumerable<CompanyDto>>> GetCompanies() {
+
             var companies = await _companyRepository.GetCompaniesAsync();
             var companyDtos = _mapper.Map<IEnumerable<CompanyDto>>(companies);
             

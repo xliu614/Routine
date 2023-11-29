@@ -56,22 +56,31 @@ namespace Routine.Api
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+            else {
+                app.UseExceptionHandler(appBuilder =>
                 {
-                    //app.UseSwagger();
-                    //app.UseSwaggerUI();
-                }
-
+                    appBuilder.Run(async context =>
+                    {
+                        context.Response.StatusCode = 500;
+                        await context.Response.WriteAsync("Unexpected Error on the server.");
+                    });
+                });
+            }
+            app.UseRouting();
 
             app.UseAuthorization();
-            app.MapControllers();
+            //app.MapControllers();
 
-            //app.UseEndpoints(endpoints =>
-            //{
-            //    //endpoints.MapRazorPages(); //Routes for pages
-            //    endpoints.MapControllers(); //Routes for my API controllers
-            //});
+            app.UseEndpoints(endpoints =>
+            {
+                //endpoints.MapRazorPages(); //Routes for pages
+                endpoints.MapControllers(); //Routes for my API controllers
+            });
 
-            //app.MapRazorPages();
+
 
             app.Run();
         }
