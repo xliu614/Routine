@@ -28,7 +28,7 @@ namespace Routine.Api.Controllers
             return Ok(employeesDto);
         }
 
-        [HttpGet("{employeeId}")]
+        [HttpGet("{employeeId}", Name=nameof(GetEmployeeForCompany))]
         public async Task<ActionResult<EmployeeDto>> GetEmployeeForCompany(Guid companyId, Guid employeeId)
         {
             if (!await _companyRepository.CompanyExistsAsync(companyId))
@@ -46,5 +46,16 @@ namespace Routine.Api.Controllers
             return Ok(_mapper.Map<EmployeeDto>(_mapper.Map<EmployeeDto>(employee)));
         }
 
+        [HttpPost]
+        public async Task<ActionResult<EmployeeDto>> CreateEmployeeForCompany(Guid companyId, EmployeeAddDto employee) {
+            if (!await _companyRepository.CompanyExistsAsync(companyId))
+                return NotFound();
+            var entity = _mapper.Map<Employee>(employee);
+            _companyRepository.AddEmployee(companyId, entity);
+            await _companyRepository.SaveAsync();
+
+            var dtoToReturn = _mapper.Map<EmployeeDto>(entity);
+            return CreatedAtRoute(nameof(GetEmployeeForCompany), new { companyId = companyId, employeeId = dtoToReturn.Id }, dtoToReturn);
+        }
     }
 }

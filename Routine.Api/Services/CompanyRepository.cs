@@ -174,7 +174,7 @@ namespace Routine.Api.Services
                 throw new ArgumentNullException(nameof(companyId));
             if(employee == null)
                 throw new ArgumentNullException(nameof(employee)); 
-            employee.CompanyId = Guid.NewGuid();
+            employee.CompanyId = companyId;
             _context.Employees.Add(employee);
         }        
 
