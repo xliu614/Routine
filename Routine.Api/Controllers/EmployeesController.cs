@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Routine.Api.DtoParems;
 using Routine.Api.Entities;
 using Routine.Api.Models;
 using Routine.Api.Services;
@@ -19,11 +20,11 @@ namespace Routine.Api.Controllers
             _companyRepository = companyRepository ?? throw new ArgumentNullException(nameof(companyRepository));
         }
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<EmployeeDto>>> GetEmployeesForCompany(Guid companyId, [FromQuery (Name = "gender")] string? genderDisplay, string? q) {
+        public async Task<ActionResult<IEnumerable<EmployeeDto>>> GetEmployeesForCompany(Guid companyId, [FromQuery]EmployeeDtoParameters? parameters) {
             if (!await _companyRepository.CompanyExistsAsync(companyId)) {
                 return NotFound();
             }
-            var employees = await _companyRepository.GetEmployeesAsync(companyId, genderDisplay, q);
+            var employees = await _companyRepository.GetEmployeesAsync(companyId, parameters);
             var employeesDto = _mapper.Map<IEnumerable<EmployeeDto>>(employees);
             return Ok(employeesDto);
         }

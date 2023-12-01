@@ -49,7 +49,7 @@ namespace Routine.Api.Services
         /// </summary>
         /// <param name="companyId"></param>
         /// <returns></returns>
-        Task<IEnumerable<Employee>> GetEmployeesAsync(Guid companyId, string? genderDisplay, string? q);
+        Task<IEnumerable<Employee>> GetEmployeesAsync(Guid companyId, EmployeeDtoParameters parameters);
         /// <summary>
         /// Get a specific employee
         /// </summary>

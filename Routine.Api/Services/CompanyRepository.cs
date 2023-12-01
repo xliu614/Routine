@@ -133,13 +133,13 @@ namespace Routine.Api.Services
         /// <param name="companyId"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
-        public async Task<IEnumerable<Employee>> GetEmployeesAsync(Guid companyId, string? genderDisplay, string? q)
+        public async Task<IEnumerable<Employee>> GetEmployeesAsync(Guid companyId, EmployeeDtoParameters parameters)
         {
             if (companyId == Guid.Empty)
                 throw new ArgumentNullException(nameof(companyId));
 
             //If genderDisplay and q are null then display all the employees under the company
-            if (string.IsNullOrWhiteSpace(genderDisplay) && string.IsNullOrWhiteSpace(q))
+            if (string.IsNullOrWhiteSpace(parameters.GenderDisplay) && string.IsNullOrWhiteSpace(parameters.SearchTerm))
             {
                 return await _context.Employees.
                        Where(x => x.CompanyId == companyId)
@@ -149,17 +149,18 @@ namespace Routine.Api.Services
 
             var items = _context.Employees.Where(i => i.CompanyId == companyId);
 
-            if (!string.IsNullOrWhiteSpace(genderDisplay)) {
+            if (!string.IsNullOrWhiteSpace(parameters.GenderDisplay)) {
 
-                genderDisplay = genderDisplay.Trim();
-                var gender = Enum.Parse<Gender>(genderDisplay);
+                parameters.GenderDisplay = parameters.GenderDisplay.Trim();
+                var gender = Enum.Parse<Gender>(parameters.GenderDisplay);
 
                 items = items.Where(x => x.Gender == gender);
             }
 
-            if (!string.IsNullOrWhiteSpace(q)) {
-                q = q.Trim();
-                items = items.Where(x => x.EmployeeNo.Contains(q) || x.FirstName.Contains(q) || x.LastName.Contains(q));
+            if (!string.IsNullOrWhiteSpace(parameters.SearchTerm)) {
+                parameters.SearchTerm = parameters.SearchTerm.Trim();
+                items = items.Where(x => x.EmployeeNo.Contains(parameters.SearchTerm) 
+                || x.FirstName.Contains(parameters.SearchTerm) || x.LastName.Contains(parameters.SearchTerm));
             
             }           
 
