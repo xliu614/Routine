@@ -161,8 +161,7 @@ namespace Routine.Api.Services
                 q = q.Trim();
                 items = items.Where(x => x.EmployeeNo.Contains(q) || x.FirstName.Contains(q) || x.LastName.Contains(q));
             
-            }
-            
+            }           
 
             return await items
                        .OrderBy(x => x.EmployeeNo)
@@ -183,7 +182,7 @@ namespace Routine.Api.Services
             _context.Employees.Remove(employee);
         }
 
-        public void UpdateEmployee(Employee employee)        {
+        public void UpdateEmployee(Employee employee)  {
             
         }
         #endregion

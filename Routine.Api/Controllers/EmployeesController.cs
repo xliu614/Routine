@@ -57,5 +57,20 @@ namespace Routine.Api.Controllers
             var dtoToReturn = _mapper.Map<EmployeeDto>(entity);
             return CreatedAtRoute(nameof(GetEmployeeForCompany), new { companyId = companyId, employeeId = dtoToReturn.Id }, dtoToReturn);
         }
+
+        [HttpPut("{employeeId}")]
+        public async Task<IActionResult> UpdateEmployeeForCompany(Guid companyId, Guid employeeId, EmployeeUpdateDto employee) {
+            if (!await _companyRepository.CompanyExistsAsync(companyId))
+                return NotFound();
+            var employeeEntity = await _companyRepository.GetEmployeeAsync(companyId, employeeId);
+            if (employeeEntity == null) {  return NotFound(); }
+            //convert employeeEnity to EmployeeDto since the source is employee of the type EmployeeDto
+            //employee's property or data now update EmployeeDto
+            //then convert the EmployeeDto back to Employee or employeeEntity in this case
+            _mapper.Map(employee, employeeEntity);
+            _companyRepository.UpdateEmployee(employeeEntity);
+            await _companyRepository.SaveAsync();
+            return NoContent();
+        }
     }
 }

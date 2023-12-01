@@ -2,6 +2,7 @@ using Routine.Api.Data;
 using Routine.Api.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Routine.Api
 {
@@ -15,14 +16,33 @@ namespace Routine.Api
             // Add services to the container.
             //builder.Services.AddRazorPages();
             builder.Services.AddControllers(
-                setup => { setup.ReturnHttpNotAcceptable = true;
+                setup =>
+                {
+                    setup.ReturnHttpNotAcceptable = true;
                     //suppport XML output
                     //OutputFormatters is a collection, and by default it supports json, so one can add for XML, now we have both json and xml
                     //setup.OutputFormatters.Add(new XmlDataContractSerializerOutputFormatter());
-                    
+
                     //if want to setup the default formater as for xml
                     //setup.OutputFormatters.Insert(0, new XmlDataContractSerializerOutputFormatter());
-                }).AddXmlDataContractSerializerFormatters(); // this is to add xml formatter for both input and output formatters
+                }).AddXmlDataContractSerializerFormatters() // this is to add xml formatter for both input and output formatters
+                  .ConfigureApiBehaviorOptions(setup => setup.InvalidModelStateResponseFactory = context =>
+                  {
+                      var websiteBaseUrl = $"{context.HttpContext.Request.Scheme}://{context.HttpContext.Request.Host}";
+                      var problemDetails = new ValidationProblemDetails(context.ModelState) {
+                          Type = websiteBaseUrl,
+                          Title = "There is an error!",
+                          Status = StatusCodes.Status422UnprocessableEntity,
+                          Detail = "Please review the details",
+                          Instance = context.HttpContext.Request.Path
+                      };
+
+                      problemDetails.Extensions.Add("traceId", context.HttpContext.TraceIdentifier);
+
+                      return new UnprocessableEntityObjectResult(problemDetails) {
+                            ContentTypes = { "application/problem+json"}
+                      };
+                  });
             builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             builder.Services.AddTransient<ICompanyRepository, CompanyRepository>();
             builder.Services.AddDbContext<RoutineDbContext>(option =>
