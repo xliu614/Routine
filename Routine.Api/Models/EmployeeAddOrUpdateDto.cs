@@ -22,6 +22,8 @@ namespace Routine.Api.Models
         public string? FirstName { get; set; }
         [Display(Name = "Last Name"), Required(ErrorMessage = "You have to input {0}"), MaxLength(50, ErrorMessage = "{0}'s length cannot be larger than {1}")]
         public string? LastName { get; set; }
+        
+        [Range(1,2,ErrorMessage="Invalid gender value, value must be 1 or 2")]
         public Gender Gender { get; set; }
         public DateTime DateOfBirth { get; set; }
 

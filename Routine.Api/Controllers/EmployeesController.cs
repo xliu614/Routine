@@ -64,7 +64,17 @@ namespace Routine.Api.Controllers
             if (!await _companyRepository.CompanyExistsAsync(companyId))
                 return NotFound();
             var employeeEntity = await _companyRepository.GetEmployeeAsync(companyId, employeeId);
-            if (employeeEntity == null) {  return NotFound(); }
+            if (employeeEntity == null) {
+                //return NotFound();
+                var addEntity = _mapper.Map<Employee>(employee);
+                addEntity.Id = employeeId;
+                addEntity.CompanyId = companyId;
+                _companyRepository.AddEmployee(companyId, addEntity);
+                await _companyRepository.SaveAsync();
+
+                var dtoToReturn = _mapper.Map<EmployeeDto>(addEntity);
+                return CreatedAtRoute(nameof(GetEmployeeForCompany), new { companyId = companyId, employeeId = dtoToReturn.Id }, dtoToReturn);
+            }
             //convert employeeEnity to EmployeeDto since the source is employee of the type EmployeeDto
             //employee's property or data now update EmployeeDto
             //then convert the EmployeeDto back to Employee or employeeEntity in this case
