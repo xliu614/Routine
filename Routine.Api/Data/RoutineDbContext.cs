@@ -26,7 +26,7 @@ namespace Routine.Api.Data
             modelBuilder.Entity<Employee>()
                 .HasOne(navigationExpression: x => x.Company)
                 .WithMany(navigationExpression: x => x.Employees)
-                .HasForeignKey(x => x.CompanyId).OnDelete(DeleteBehavior.Restrict);
+                .HasForeignKey(x => x.CompanyId).OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Company>().HasData(
                 new Company

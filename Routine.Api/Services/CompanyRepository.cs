@@ -139,7 +139,7 @@ namespace Routine.Api.Services
                 throw new ArgumentNullException(nameof(companyId));
 
             //If genderDisplay and q are null then display all the employees under the company
-            if (string.IsNullOrWhiteSpace(parameters.GenderDisplay) && string.IsNullOrWhiteSpace(parameters.SearchTerm))
+            if (parameters == null || string.IsNullOrWhiteSpace(parameters.GenderDisplay) && string.IsNullOrWhiteSpace(parameters.SearchTerm))
             {
                 return await _context.Employees.
                        Where(x => x.CompanyId == companyId)
