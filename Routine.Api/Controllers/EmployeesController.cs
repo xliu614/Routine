@@ -1,5 +1,9 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.Extensions.Options;
 using Routine.Api.DtoParems;
 using Routine.Api.Entities;
 using Routine.Api.Models;
@@ -82,6 +86,46 @@ namespace Routine.Api.Controllers
             _companyRepository.UpdateEmployee(employeeEntity);
             await _companyRepository.SaveAsync();
             return NoContent();
+        }
+        [HttpPatch("{employeeId}")]
+        public async Task<IActionResult> PartialUpdateEmployee(Guid companyId, Guid employeeId, JsonPatchDocument<EmployeeUpdateDto> patchDocument) {
+            if (!await _companyRepository.CompanyExistsAsync(companyId))
+                return NotFound();
+            var employeeEntity = await _companyRepository.GetEmployeeAsync(companyId, employeeId);
+            
+            if (employeeEntity == null) {
+               var employeeDto = new EmployeeUpdateDto();
+               patchDocument.ApplyTo(employeeDto, ModelState);
+
+                if (!TryValidateModel(employeeDto))
+                    return ValidationProblem(ModelState);
+
+                var employeeToAdd = _mapper.Map<Employee>(employeeDto);
+                employeeToAdd.Id = employeeId;
+
+                _companyRepository.AddEmployee(companyId, employeeToAdd);
+                await _companyRepository.SaveAsync();
+
+                var dtoToReturn = _mapper.Map<EmployeeDto>(employeeToAdd);
+                return CreatedAtRoute(nameof(GetEmployeeForCompany), new { companyId, employeeId = employeeId }, dtoToReturn);
+            }
+                
+            var patchEntity = _mapper.Map<EmployeeUpdateDto>(employeeEntity);
+            patchDocument.ApplyTo(patchEntity, ModelState);
+            
+            //validate if there's error in patchEntity
+            if (!TryValidateModel(patchEntity))
+                return ValidationProblem(ModelState);
+            _mapper.Map(patchEntity, employeeEntity);
+            _companyRepository.UpdateEmployee(employeeEntity);
+            await _companyRepository.SaveAsync();
+            return NoContent();
+        }
+
+        public override ActionResult ValidationProblem([ActionResultObjectValue] ModelStateDictionary modelStateDictionary)
+        {
+            var options = HttpContext.RequestServices.GetRequiredService<IOptions<ApiBehaviorOptions>>();
+            return (ActionResult)options.Value.InvalidModelStateResponseFactory(ControllerContext);
         }
     }
 }

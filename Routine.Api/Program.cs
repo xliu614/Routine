@@ -3,6 +3,7 @@ using Routine.Api.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Serialization;
 
 namespace Routine.Api
 {
@@ -25,8 +26,13 @@ namespace Routine.Api
 
                     //if want to setup the default formater as for xml
                     //setup.OutputFormatters.Insert(0, new XmlDataContractSerializerOutputFormatter());
-                }).AddXmlDataContractSerializerFormatters() // this is to add xml formatter for both input and output formatters
-                  .ConfigureApiBehaviorOptions(setup => setup.InvalidModelStateResponseFactory = context =>
+                })
+                //the defaulted json serializer is replaced by NewtonsoftJson, so put this in front of the XML formatter
+                .AddNewtonsoftJson(setup => {
+                    setup.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+                })
+                .AddXmlDataContractSerializerFormatters() // this is to add xml formatter for both input and output formatters
+                .ConfigureApiBehaviorOptions(setup => setup.InvalidModelStateResponseFactory = context =>
                   {
                       var websiteBaseUrl = $"{context.HttpContext.Request.Scheme}://{context.HttpContext.Request.Host}";
                       var problemDetails = new ValidationProblemDetails(context.ModelState) {
@@ -42,7 +48,8 @@ namespace Routine.Api
                       return new UnprocessableEntityObjectResult(problemDetails) {
                             ContentTypes = { "application/problem+json"}
                       };
-                  });
+                  })
+                ;
             builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             builder.Services.AddTransient<ICompanyRepository, CompanyRepository>();
             builder.Services.AddDbContext<RoutineDbContext>(option =>
