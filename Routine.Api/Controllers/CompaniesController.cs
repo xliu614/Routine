@@ -124,7 +124,7 @@ namespace Routine.Api.Controllers
             var companyEntity = await _companyRepository.GetCompanyAsync(companyId);
             if (companyEntity == null)
                 return NotFound();
-
+            //Load all the company's employees to memory
             await _companyRepository.GetEmployeesAsync(companyId, null);
             _companyRepository.DeleteCompany(companyEntity);
             await _companyRepository.SaveAsync();
