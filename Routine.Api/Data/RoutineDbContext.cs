@@ -46,6 +46,48 @@ namespace Routine.Api.Data
                     Id = Guid.Parse("70608d93-5746-4b0b-b73d-88871033a660"),
                     Name = "Alipapa",
                     Introduction = "Fubao China"
+                }, 
+                new Company
+                {
+                    Id = Guid.Parse("bbdee09c-089b-4d30-bece-44df59237100"),
+                    Name = "Tencent",
+                    Introduction = "From Shenzhen"                   
+                },
+                new Company
+                {
+                    Id = Guid.Parse("6fb600c1-9011-4fd7-9234-881379716400"),
+                    Name = "Baidu",
+                    Introduction = "From Beijing"
+                },
+                new Company
+                {
+                    Id = Guid.Parse("5efc910b-2f45-43df-afae-620d40542800"),
+                    Name = "Adobe",
+                    Introduction = "Photoshop?"
+                },
+                new Company
+                {
+                    Id = Guid.Parse("bbdee09c-089b-4d30-bece-44df59237111"),
+                    Name = "SpaceX",
+                    Introduction = "Wow"
+                },
+                new Company
+                {
+                    Id = Guid.Parse("6fb600c1-9011-4fd7-9234-881379716422"),
+                    Name = "Youtube",
+                    Introduction = "Blocked"
+                },
+                new Company
+                {
+                    Id = Guid.Parse("6fb600c1-9011-4fd7-9234-881379716444"),
+                    Name = "Yahoo",
+                    Introduction = "Who?"
+                },
+                new Company
+                {
+                    Id = Guid.Parse("5efc910b-2f45-43df-afae-620d40542844"),
+                    Name = "Firefox",
+                    Introduction = "Is it a company?"
                 }
            );
            modelBuilder.Entity<Employee>().HasData(
