@@ -27,9 +27,9 @@ namespace Routine.Api.Services
                 throw new ArgumentNullException(nameof(parameters));
             }
 
-            if (string.IsNullOrWhiteSpace(parameters.CompanyName) && string.IsNullOrWhiteSpace(parameters.SearchTerm)) {
-                return await _context.Companies.ToListAsync();
-            }
+            //if (string.IsNullOrWhiteSpace(parameters.CompanyName) && string.IsNullOrWhiteSpace(parameters.SearchTerm)) {
+            //    return await _context.Companies.ToListAsync();
+            //}
 
             var query = _context.Companies as IQueryable<Company>;
 
@@ -42,6 +42,10 @@ namespace Routine.Api.Services
                 parameters.SearchTerm = parameters.SearchTerm.Trim();
                 query = query.Where(c => c.Name.Contains(parameters.SearchTerm) || c.Introduction.Contains(parameters.SearchTerm));
             }
+
+            //after filtering is done, then do the pagination:
+            query = query.Skip(parameters.PageSize * (parameters.PageNumber - 1))
+                .Take(parameters.PageSize);
                 
             return await query.ToListAsync();
         }
