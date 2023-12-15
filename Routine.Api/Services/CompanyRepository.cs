@@ -2,6 +2,7 @@
 using Routine.Api.Data;
 using Routine.Api.DtoParems;
 using Routine.Api.Entities;
+using Routine.Api.Helpers;
 using System.Linq;
 
 namespace Routine.Api.Services
@@ -21,7 +22,7 @@ namespace Routine.Api.Services
         /// Get Company list
         /// </summary>
         /// <returns></returns>
-        public async Task<IEnumerable<Company>> GetCompaniesAsync(CompanyDtoParameters parameters)
+        public async Task<PageList<Company>> GetCompaniesAsync(CompanyDtoParameters parameters)
         {
             if (parameters == null) {
                 throw new ArgumentNullException(nameof(parameters));
@@ -44,10 +45,12 @@ namespace Routine.Api.Services
             }
 
             //after filtering is done, then do the pagination:
-            query = query.Skip(parameters.PageSize * (parameters.PageNumber - 1))
-                .Take(parameters.PageSize);
-                
-            return await query.ToListAsync();
+            //query = query.Skip(parameters.PageSize * (parameters.PageNumber - 1))
+            //    .Take(parameters.PageSize);
+            //return await query.ToListAsync();
+
+            return await PageList<Company>.Create(query, parameters.PageNumber, parameters.PageSize);             
+
         }
         /// <summary>
         /// Get a single company
