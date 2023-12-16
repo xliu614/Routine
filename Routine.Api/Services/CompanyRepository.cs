@@ -146,13 +146,13 @@ namespace Routine.Api.Services
                 throw new ArgumentNullException(nameof(companyId));
 
             //If genderDisplay and q are null then display all the employees under the company
-            if (parameters == null || string.IsNullOrWhiteSpace(parameters.GenderDisplay) && string.IsNullOrWhiteSpace(parameters.SearchTerm))
-            {
-                return await _context.Employees.
-                       Where(x => x.CompanyId == companyId)
-                       .OrderBy(x => x.EmployeeNo)
-                       .ToListAsync();
-            }
+            //if (parameters == null || string.IsNullOrWhiteSpace(parameters.GenderDisplay) && string.IsNullOrWhiteSpace(parameters.SearchTerm))
+            //{
+            //    return await _context.Employees.
+            //           Where(x => x.CompanyId == companyId)
+            //           .OrderBy(x => x.EmployeeNo)
+            //           .ToListAsync();
+            //}
 
             var items = _context.Employees.Where(i => i.CompanyId == companyId);
 
@@ -167,12 +167,18 @@ namespace Routine.Api.Services
             if (!string.IsNullOrWhiteSpace(parameters.SearchTerm)) {
                 parameters.SearchTerm = parameters.SearchTerm.Trim();
                 items = items.Where(x => x.EmployeeNo.Contains(parameters.SearchTerm) 
-                || x.FirstName.Contains(parameters.SearchTerm) || x.LastName.Contains(parameters.SearchTerm));
-            
-            }           
+                || x.FirstName.Contains(parameters.SearchTerm) || x.LastName.Contains(parameters.SearchTerm));            
+            }
 
-            return await items
-                       .OrderBy(x => x.EmployeeNo)
+            //Do order by
+            if (!string.IsNullOrWhiteSpace(parameters.OrderBy)) {
+                if (parameters.OrderBy.ToLower() == "name")
+                {
+                    items = items.OrderBy(x => x.FirstName).ThenBy(x => x.LastName);
+                }
+            }
+
+            return await items          
                        .ToListAsync();
         }
         public void AddEmployee(Guid companyId, Employee employee)
