@@ -103,6 +103,46 @@ namespace Routine.Api.Data
                  },
                  new Employee
                  {
+                     Id = Guid.Parse("4b501cb3-d168-4cc0-b375-48fb33f317a4"),
+                     CompanyId = Guid.Parse("5836d897-741b-4895-ae31-e6f3f1be1ffd"),
+                     DateOfBirth = new DateTime(1976, 1, 2),
+                     EmployeeNo = "MSFT232",
+                     FirstName = "Nick",
+                     LastName = "Cas",
+                     Gender = Gender.Female
+                 },
+                 new Employee
+                 {
+                     Id = Guid.Parse("4b501cb3-d168-4cc0-b375-48fb33f318a5"),
+                     CompanyId = Guid.Parse("5836d897-741b-4895-ae31-e6f3f1be1ffd"),
+                     DateOfBirth = new DateTime(1977, 11, 2),
+                     EmployeeNo = "MSFT239",
+                     FirstName = "Nicholas",
+                     LastName = "Cas",
+                     Gender = Gender.Male
+                 },
+                 new Employee
+                 {
+                     Id = Guid.Parse("4b501cb3-d168-4cc0-b375-48fb33f318a6"),
+                     CompanyId = Guid.Parse("5836d897-741b-4895-ae31-e6f3f1be1ffd"),
+                     DateOfBirth = new DateTime(1977, 11, 2),
+                     EmployeeNo = "MSFT240",
+                     FirstName = "Vincent",
+                     LastName = "Agent",
+                     Gender = Gender.Male
+                 },
+                 new Employee
+                 {
+                     Id = Guid.Parse("4b501cb3-d168-4cc0-b375-48fb33f318b4"),
+                     CompanyId = Guid.Parse("5836d897-741b-4895-ae31-e6f3f1be1ffd"),
+                     DateOfBirth = new DateTime(1978, 11, 2),
+                     EmployeeNo = "MSFT240",
+                     FirstName = "Louis",
+                     LastName = "Gentel",
+                     Gender = Gender.Male
+                 },
+                 new Employee
+                 {
                      Id = Guid.Parse("7eaa532c-1be5-472c-a738-94fd26e5fad6"),
                      CompanyId = Guid.Parse("5836d897-741b-4895-ae31-e6f3f1be1ffd"),
                      DateOfBirth = new DateTime(1981, 12, 5),
