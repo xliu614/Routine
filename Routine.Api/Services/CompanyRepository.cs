@@ -178,6 +178,8 @@ namespace Routine.Api.Services
                 }
             }
 
+            //items.ApplySort(parameters.OrderBy, mappingDictionary);
+
             return await items          
                        .ToListAsync();
         }
