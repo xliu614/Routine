@@ -156,6 +156,7 @@ namespace Routine.Api.Controllers
                 case ResourceUriType.PreviousPage:
                     return Url.Link(nameof(GetCompanies), new
                     {
+                        orderBy = parameters.OrderBy,
                         pageNumber = parameters.PageNumber - 1,
                         pageSize = parameters.PageSize,
                         companyName = parameters.CompanyName,
@@ -165,6 +166,7 @@ namespace Routine.Api.Controllers
                 case ResourceUriType.NextPage:
                     return Url.Link(nameof(GetCompanies), new
                     {
+                        orderBy = parameters.OrderBy,
                         pageNumber = parameters.PageNumber + 1,
                         pageSize = parameters.PageSize,
                         companyName = parameters.CompanyName,
@@ -174,6 +176,7 @@ namespace Routine.Api.Controllers
                 default:
                     return Url.Link(nameof(GetCompanies), new
                     {
+                        orderBy = parameters.OrderBy,
                         pageNumber = parameters.PageNumber,
                         pageSize = parameters.PageSize,
                         companyName = parameters.CompanyName,

@@ -7,6 +7,7 @@
         public string? SearchTerm { get; set; }
         public int PageNumber { get; set; } = 1;
         private int _pageSize = 5;
+        public string OrderBy { get; set; } = "CompanyName";
         public int PageSize { 
             get => _pageSize;
             set {
