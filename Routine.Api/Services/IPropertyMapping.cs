@@ -2,6 +2,6 @@
 {
     public interface IPropertyMapping
     {
-        public Dictionary<string, PropertyMappingValue> GetPropertyMapping<TSource, TDestination>();
+        
     }
 }

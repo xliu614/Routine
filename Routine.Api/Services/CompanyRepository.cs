@@ -3,6 +3,7 @@ using Routine.Api.Data;
 using Routine.Api.DtoParems;
 using Routine.Api.Entities;
 using Routine.Api.Helpers;
+using Routine.Api.Models;
 using System.Linq;
 
 namespace Routine.Api.Services
@@ -11,9 +12,13 @@ namespace Routine.Api.Services
     {
         #region ctor
         private readonly RoutineDbContext _context;
-        public CompanyRepository(RoutineDbContext context)
+
+        private readonly IPropertyMappingService _propertyMappingService;
+
+        public CompanyRepository(RoutineDbContext context, IPropertyMappingService propertyMappingService)
         {
             _context = context;
+            _propertyMappingService = propertyMappingService ?? throw new ArgumentNullException(nameof(propertyMappingService));
         }
         #endregion
 
@@ -178,7 +183,10 @@ namespace Routine.Api.Services
                 }
             }
 
-            //items.ApplySort(parameters.OrderBy, mappingDictionary);
+            var mappingDictionary = _propertyMappingService.GetPropertyMapping<EmployeeDto, Employee>();
+
+            items = items.ApplySort(parameters.OrderBy, mappingDictionary);
+
 
             return await items          
                        .ToListAsync();
