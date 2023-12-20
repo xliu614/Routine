@@ -53,6 +53,7 @@ namespace Routine.Api
             builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             builder.Services.AddTransient<ICompanyRepository, CompanyRepository>();
             builder.Services.AddTransient<IPropertyMappingService, PropertyMappingService>();
+            builder.Services.AddTransient<IPropertyCheckerService, PropertyCheckerService>();
             builder.Services.AddDbContext<RoutineDbContext>(option =>
             {
                 option.UseSqlite("Data Source=routine.db");

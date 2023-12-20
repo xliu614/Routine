@@ -22,12 +22,16 @@ namespace Routine.Api.Controllers
         private readonly ICompanyRepository _companyRepository;
         private readonly IMapper _mapper;
         private readonly IPropertyMappingService _propertyMappingService;
+        private readonly IPropertyCheckerService _propertyCheckerService;
 
-        public CompaniesController(ICompanyRepository companyRepository, IMapper mapper, IPropertyMappingService propertyMappingService)
+        public CompaniesController(ICompanyRepository companyRepository, IMapper mapper, 
+            IPropertyMappingService propertyMappingService,
+            IPropertyCheckerService propertyCheckerService)
         {
             _companyRepository = companyRepository ?? throw new ArgumentNullException(nameof(companyRepository));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
-            _propertyMappingService = propertyMappingService ?? throw new ArgumentNullException(nameof(PropertyMappingService));
+            _propertyMappingService = propertyMappingService ?? throw new ArgumentNullException(nameof(propertyMappingService));
+            _propertyCheckerService = propertyCheckerService ?? throw new ArgumentNullException(nameof(propertyCheckerService));
         }
         /// <summary>
         /// Get companies list
@@ -40,6 +44,10 @@ namespace Routine.Api.Controllers
         public async Task<IActionResult> GetCompanies([FromQuery]CompanyDtoParameters? parameters) {
 
             if (!_propertyMappingService.ValidMappingExistsFor<CompanyDto, Company>(parameters.OrderBy)) {
+                return BadRequest();
+            }
+
+            if (!_propertyCheckerService.TypeHasProperties<CompanyDto>(parameters.Fields)) {
                 return BadRequest();
             }
             var companies = await _companyRepository.GetCompaniesAsync(parameters);
@@ -68,18 +76,23 @@ namespace Routine.Api.Controllers
         }
 
         [HttpGet("{companyId}", Name = nameof(GetCompanyById))]
-        public async Task<ActionResult<CompanyDto>> GetCompanyById(Guid companyId) //api/companies/123
+        public async Task<ActionResult<CompanyDto>> GetCompanyById(Guid companyId, string? fields) //api/companies/123
         {
             //if doing judgement for exist like this, then after exist is true if someone remove the resource then there's a risk of actual not founding the content
             //var exist = await _companyRepository.CompanyExistsAsync(companyId);
             //if (!exist)
             //    return NotFound();
 
+            if (!_propertyCheckerService.TypeHasProperties<CompanyDto>(fields))
+            {
+                return BadRequest();
+            }
+
             var company = await _companyRepository.GetCompanyAsync(companyId);
             if (company == null)
                 return NotFound();
 
-            return Ok(_mapper.Map<CompanyDto>(company));
+            return Ok(_mapper.Map<CompanyDto>(company).ShapeData(fields));
         }
 
         /// <summary>
