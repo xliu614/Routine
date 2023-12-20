@@ -40,5 +40,20 @@ namespace Routine.Api.Services
             throw new Exception($"Cannot find unique mapping: {typeof(TSource)}, {typeof(TDestination)} ");
         }
 
+        public bool ValidMappingExistsFor<TSource, TDestination>(string inputFields) {
+            var propertyMapping = GetPropertyMapping<TSource, TDestination>();
+            if (string.IsNullOrWhiteSpace(inputFields))
+                //at this moment, there's no input orderBy fields needing to do order by
+                return true;
+            var orderBys = inputFields.Split(',');
+            foreach (string orderBy in orderBys) {
+                var trimmedOrderBy = orderBy.Trim();
+                var indexOfFirstSpace = trimmedOrderBy.IndexOf(" ", StringComparison.OrdinalIgnoreCase);
+                var orderByName = indexOfFirstSpace == -1 ? trimmedOrderBy : trimmedOrderBy.Remove(indexOfFirstSpace);
+                if (!propertyMapping.ContainsKey(orderByName))
+                    return false;
+            }
+            return true;
+        }
     }
 }

@@ -21,11 +21,13 @@ namespace Routine.Api.Controllers
     {
         private readonly ICompanyRepository _companyRepository;
         private readonly IMapper _mapper;
+        private readonly IPropertyMappingService _propertyMappingService;
 
-        public CompaniesController(ICompanyRepository companyRepository, IMapper mapper)
+        public CompaniesController(ICompanyRepository companyRepository, IMapper mapper, IPropertyMappingService propertyMappingService)
         {
             _companyRepository = companyRepository ?? throw new ArgumentNullException(nameof(companyRepository));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            _propertyMappingService = propertyMappingService ?? throw new ArgumentNullException(nameof(PropertyMappingService));
         }
         /// <summary>
         /// Get companies list
@@ -37,6 +39,9 @@ namespace Routine.Api.Controllers
         [HttpHead]
         public async Task<ActionResult<IEnumerable<CompanyDto>>> GetCompanies([FromQuery]CompanyDtoParameters? parameters) {
 
+            if (!_propertyMappingService.ValidMappingExistsFor<CompanyDto, Company>(parameters.OrderBy)) {
+                return BadRequest();
+            }
             var companies = await _companyRepository.GetCompaniesAsync(parameters);
             var previousPageLink = companies.HasPrevious? CreateCompaniesResourceUri(parameters, ResourceUriType.PreviousPage) : null;
             var nextPageLink = companies.HasNext ? CreateCompaniesResourceUri(parameters, ResourceUriType.NextPage) : null;
