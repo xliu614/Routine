@@ -37,7 +37,7 @@ namespace Routine.Api.Controllers
         /// <returns>If choose HttpHead then the there's no body in the response</returns>
         [HttpGet(Name=nameof(GetCompanies))]
         [HttpHead]
-        public async Task<ActionResult<IEnumerable<CompanyDto>>> GetCompanies([FromQuery]CompanyDtoParameters? parameters) {
+        public async Task<IActionResult> GetCompanies([FromQuery]CompanyDtoParameters? parameters) {
 
             if (!_propertyMappingService.ValidMappingExistsFor<CompanyDto, Company>(parameters.OrderBy)) {
                 return BadRequest();
@@ -61,9 +61,10 @@ namespace Routine.Api.Controllers
               Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
             }));
 
+            //The returned values can be not a complete CompanyDto
             var companyDtos = _mapper.Map<IEnumerable<CompanyDto>>(companies);
             
-            return Ok(companyDtos);
+            return Ok(companyDtos.ShapeData(parameters.Fields));
         }
 
         [HttpGet("{companyId}", Name = nameof(GetCompanyById))]
@@ -161,6 +162,7 @@ namespace Routine.Api.Controllers
                 case ResourceUriType.PreviousPage:
                     return Url.Link(nameof(GetCompanies), new
                     {
+                        fields = parameters.Fields,
                         orderBy = parameters.OrderBy,
                         pageNumber = parameters.PageNumber - 1,
                         pageSize = parameters.PageSize,
@@ -171,6 +173,7 @@ namespace Routine.Api.Controllers
                 case ResourceUriType.NextPage:
                     return Url.Link(nameof(GetCompanies), new
                     {
+                        fields = parameters.Fields,
                         orderBy = parameters.OrderBy,
                         pageNumber = parameters.PageNumber + 1,
                         pageSize = parameters.PageSize,
@@ -181,6 +184,7 @@ namespace Routine.Api.Controllers
                 default:
                     return Url.Link(nameof(GetCompanies), new
                     {
+                        fields = parameters.Fields,
                         orderBy = parameters.OrderBy,
                         pageNumber = parameters.PageNumber,
                         pageSize = parameters.PageSize,

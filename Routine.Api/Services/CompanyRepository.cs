@@ -59,6 +59,7 @@ namespace Routine.Api.Services
             query = query.ApplySort(parameters.OrderBy, mappingDictionary);
 
             return await PageList<Company>.Create(query, parameters.PageNumber, parameters.PageSize);             
+            return await PageList<Company>.Create(query, parameters.PageNumber, parameters.PageSize);             
 
         }
         /// <summary>

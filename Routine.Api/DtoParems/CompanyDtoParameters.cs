@@ -17,7 +17,9 @@
                 //    _pageSize = value;
                 _pageSize = (value > MaxPageSize) ? MaxPageSize : value;
             }
-        } 
+        }
+        //to do the fields shape. 
+        public string? Fields { get; set; }
 
     }
 }
