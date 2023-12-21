@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Routine.Api.Data;
 
@@ -10,9 +11,11 @@ using Routine.Api.Data;
 namespace Routine.Api.Migrations
 {
     [DbContext(typeof(RoutineDbContext))]
-    partial class RoutineDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231221002328_adjustColumnsAndAddCompany")]
+    partial class adjustColumnsAndAddCompany
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.13");
@@ -24,17 +27,14 @@ namespace Routine.Api.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Country")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Industry")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Introduction")
-                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
@@ -44,7 +44,6 @@ namespace Routine.Api.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Product")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
@@ -142,6 +141,12 @@ namespace Routine.Api.Migrations
                             Introduction = "Is it a company?",
                             Name = "Firefox",
                             Product = "Software"
+                        },
+                        new
+                        {
+                            Id = new Guid("5efc910b-2f45-43df-afae-620d40542845"),
+                            Introduction = "Is it a company?",
+                            Name = "TestingCompany1"
                         });
                 });
 

@@ -76,7 +76,7 @@ namespace Routine.Api.Controllers
         }
 
         [HttpGet("{companyId}", Name = nameof(GetCompanyById))]
-        public async Task<ActionResult<CompanyDto>> GetCompanyById(Guid companyId, string? fields) //api/companies/123
+        public async Task<IActionResult> GetCompanyById(Guid companyId, string? fields) //api/companies/123
         {
             //if doing judgement for exist like this, then after exist is true if someone remove the resource then there's a risk of actual not founding the content
             //var exist = await _companyRepository.CompanyExistsAsync(companyId);
@@ -92,7 +92,13 @@ namespace Routine.Api.Controllers
             if (company == null)
                 return NotFound();
 
-            return Ok(_mapper.Map<CompanyDto>(company).ShapeData(fields));
+            var links = CreateLinksForCompany(companyId, fields);
+
+            var linksDict = _mapper.Map<CompanyDto>(company).ShapeData(fields) as IDictionary<string, object>;
+
+            linksDict.Add("links", links);
+
+            return Ok(linksDict);
         }
 
         /// <summary>
@@ -110,7 +116,13 @@ namespace Routine.Api.Controllers
             await _companyRepository.SaveAsync();
 
             var returnDto = _mapper.Map<CompanyDto>(entity);
-            return CreatedAtRoute(nameof(GetCompanyById), new { companyId = returnDto.Id }, returnDto);
+
+            var links = CreateLinksForCompany(returnDto.Id, null);
+            var linksDict = returnDto.ShapeData(null) as IDictionary<string, object>;
+
+            linksDict.Add("links", links);
+
+            return CreatedAtRoute(nameof(GetCompanyById), new { companyId = returnDto.Id }, linksDict);
         }
 
         /// <summary>
@@ -158,7 +170,7 @@ namespace Routine.Api.Controllers
             Response.Headers.Add("Allow", "GET,POST,OPTIONS");
             return Ok();
         }
-        [HttpDelete("{companyId}")]
+        [HttpDelete("{companyId}", Name =(nameof(DeleteCompany)))]
         public async Task<IActionResult> DeleteCompany(Guid companyId) {
             var companyEntity = await _companyRepository.GetCompanyAsync(companyId);
             if (companyEntity == null)
@@ -208,5 +220,31 @@ namespace Routine.Api.Controllers
 
         }
 
+        private IEnumerable<LinkDto> CreateLinksForCompany(Guid companyId, string fields) {
+            var links = new List<LinkDto>();
+            //Add link for Getthe company by Id (and fields)
+            if (fields == null)
+            {
+                links.Add(new LinkDto(Url.Link(nameof(GetCompanyById), new { companyId }),
+                          "self", "GET"));
+            }
+            else {
+                links.Add(new LinkDto(Url.Link(nameof(GetCompanyById), new { companyId, fields }),
+                           "self", "GET"));
+            }
+
+            //Add link for Remove the company by Id
+            links.Add(new LinkDto(Url.Link(nameof(DeleteCompany), new { companyId}),
+                           "delete_company", "DELETE"));
+
+            //Add link for Creating employees for the company
+            links.Add(new LinkDto(Url.Link(nameof(EmployeesController.CreateEmployeeForCompany), new { companyId }),
+                           "create_employee_for_company", "POST"));
+
+            //Add link for get employees for the company
+            links.Add(new LinkDto(Url.Link(nameof(EmployeesController.GetEmployeesForCompany), new { companyId }),
+                           "get_employees_for_company", "GET"));
+            return links;
+        }
     }
 }

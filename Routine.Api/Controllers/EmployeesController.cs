@@ -23,7 +23,7 @@ namespace Routine.Api.Controllers
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _companyRepository = companyRepository ?? throw new ArgumentNullException(nameof(companyRepository));
         }
-        [HttpGet]
+        [HttpGet(Name =(nameof(GetEmployeesForCompany)))]
         public async Task<ActionResult<IEnumerable<EmployeeDto>>> GetEmployeesForCompany(Guid companyId, [FromQuery]EmployeeDtoParameters? parameters) {
             if (!await _companyRepository.CompanyExistsAsync(companyId)) {
                 return NotFound();
@@ -51,7 +51,7 @@ namespace Routine.Api.Controllers
             return Ok(_mapper.Map<EmployeeDto>(_mapper.Map<EmployeeDto>(employee)));
         }
 
-        [HttpPost]
+        [HttpPost(Name=(nameof(CreateEmployeeForCompany)))]
         public async Task<ActionResult<EmployeeDto>> CreateEmployeeForCompany(Guid companyId, EmployeeAddDto employee) {
             if (!await _companyRepository.CompanyExistsAsync(companyId))
                 return NotFound();

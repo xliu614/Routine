@@ -17,10 +17,10 @@ namespace Routine.Api.Data
         {
             //base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<Company>().Property(x => x.Name).IsRequired().HasMaxLength(100);
-            modelBuilder.Entity<Company>().Property(x => x.Introduction).HasMaxLength(500);
-            modelBuilder.Entity<Company>().Property(x => x.Country).HasMaxLength(50);
-            modelBuilder.Entity<Company>().Property(x => x.Industry).HasMaxLength(50);
-            modelBuilder.Entity<Company>().Property(x => x.Product).HasMaxLength(100);
+            modelBuilder.Entity<Company>().Property(x => x.Introduction).HasMaxLength(500).IsRequired(false);
+            modelBuilder.Entity<Company>().Property(x => x.Country).HasMaxLength(50).IsRequired(false);
+            modelBuilder.Entity<Company>().Property(x => x.Industry).HasMaxLength(50).IsRequired(false);
+            modelBuilder.Entity<Company>().Property(x => x.Product).HasMaxLength(100).IsRequired(false);
 
             modelBuilder.Entity<Employee>().Property(x => x.EmployeeNo).IsRequired().HasMaxLength(10);
             modelBuilder.Entity<Employee>().Property(x => x.FirstName).IsRequired().HasMaxLength(50);
@@ -122,6 +122,14 @@ namespace Routine.Api.Data
                     Country = "USA",
                     Industry = "Software",
                     Product = "Software"
+                },
+                new Company {
+                    Id = Guid.Parse("5efc910b-2f45-43df-afae-620d40542845"),
+                    Name = "TestingCompany1",
+                    Introduction = "Is it a company?",
+                    Country = null,
+                    Industry = null,
+                    Product = null
                 }
            );
            modelBuilder.Entity<Employee>().HasData(
