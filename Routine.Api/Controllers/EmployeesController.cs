@@ -13,6 +13,7 @@ namespace Routine.Api.Controllers
 {
     [ApiController]
     [Route("api/companies/{companyId}/employees")]
+    [ResponseCache(CacheProfileName ="120sCachProfile")]
     public class EmployeesController:ControllerBase
     {
         private readonly IMapper _mapper;
@@ -32,8 +33,14 @@ namespace Routine.Api.Controllers
             var employeesDto = _mapper.Map<IEnumerable<EmployeeDto>>(employees);
             return Ok(employeesDto);
         }
-
+        /// <summary>
+        /// Notes: ResponseCache attribute itself does not cache, but just allows server side cache
+        /// </summary>
+        /// <param name="companyId"></param>
+        /// <param name="employeeId"></param>
+        /// <returns></returns>
         [HttpGet("{employeeId}", Name=nameof(GetEmployeeForCompany))]
+        [ResponseCache(Duration = 60)]
         public async Task<ActionResult<EmployeeDto>> GetEmployeeForCompany(Guid companyId, Guid employeeId)
         {
             if (!await _companyRepository.CompanyExistsAsync(companyId))

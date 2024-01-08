@@ -16,10 +16,17 @@ namespace Routine.Api
 
             // Add services to the container.
             //builder.Services.AddRazorPages();
+
+            builder.Services.AddResponseCaching();
             builder.Services.AddControllers(
                 setup =>
                 {
                     setup.ReturnHttpNotAcceptable = true;
+                    //setup to add a cache profile, usable at controller or action level
+                    setup.CacheProfiles.Add("120sCachProfile", new CacheProfile
+                    {
+                        Duration = 120
+                    });
                     //suppport XML output
                     //OutputFormatters is a collection, and by default it supports json, so one can add for XML, now we have both json and xml
                     //setup.OutputFormatters.Add(new XmlDataContractSerializerOutputFormatter());
@@ -98,6 +105,8 @@ namespace Routine.Api
                     });
                 });
             }
+
+            app.UseResponseCaching();
             app.UseRouting();
 
             app.UseAuthorization();
