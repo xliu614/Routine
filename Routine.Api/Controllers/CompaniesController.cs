@@ -41,7 +41,7 @@ namespace Routine.Api.Controllers
         /// <returns>If choose HttpHead then the there's no body in the response</returns>
         [HttpGet(Name=nameof(GetCompanies))]
         [HttpHead]
-        public async Task<IActionResult> GetCompanies([FromQuery]CompanyDtoParameters? parameters) {
+        public async Task<IActionResult> GetCompanies([FromQuery]CompanyDtoParameters parameters) {
 
             if (!_propertyMappingService.ValidMappingExistsFor<CompanyDto, Company>(parameters.OrderBy)) {
                 return BadRequest();
@@ -51,8 +51,8 @@ namespace Routine.Api.Controllers
                 return BadRequest();
             }
             var companies = await _companyRepository.GetCompaniesAsync(parameters);
-            var previousPageLink = companies.HasPrevious? CreateCompaniesResourceUri(parameters, ResourceUriType.PreviousPage) : null;
-            var nextPageLink = companies.HasNext ? CreateCompaniesResourceUri(parameters, ResourceUriType.NextPage) : null;
+            //var previousPageLink = companies.HasPrevious? CreateCompaniesResourceUri(parameters, ResourceUriType.PreviousPage) : null;
+            //var nextPageLink = companies.HasNext ? CreateCompaniesResourceUri(parameters, ResourceUriType.NextPage) : null;
 
             //anonymous type
             var paginationMetadata = new
@@ -60,19 +60,37 @@ namespace Routine.Api.Controllers
                 totalCount = companies.Count,
                 pageSize = companies.PageSize,
                 currentPage = companies.CurrentPage,
-                previousPageLink,
-                nextPageLink
+                totalPages = companies.TotalPage
+                //previousPageLink,
+                //nextPageLink
             };
 
             Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(paginationMetadata, new JsonSerializerOptions()
             {
               Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-            }));
+            }));            
 
             //The returned values can be not a complete CompanyDto
             var companyDtos = _mapper.Map<IEnumerable<CompanyDto>>(companies);
-            
-            return Ok(companyDtos.ShapeData(parameters.Fields));
+            var shapedData = companyDtos.ShapeData(parameters.Fields);
+
+            var links = CreateLinksForCompany(parameters, companies.HasPrevious, companies.HasNext);
+
+            var shapedCompaniesWithlinks = shapedData.Select(c =>
+            {
+                var companyDict = c as IDictionary<string, object>;
+                var companyLinks = CreateLinksForCompany((Guid)companyDict["Id"], null);
+                companyDict.Add("links", companyLinks);
+                return companyDict;
+            });
+
+            var linkedCollectionResource = new
+            {
+                value = shapedCompaniesWithlinks,
+                links = links
+            };
+
+            return Ok(linkedCollectionResource);
         }
 
         [HttpGet("{companyId}", Name = nameof(GetCompanyById))]
@@ -106,7 +124,7 @@ namespace Routine.Api.Controllers
         /// </summary>
         /// <param name="company"></param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpPost(Name = nameof(CreateCompany))]
         public async Task<ActionResult<CompanyDto>> CreateCompany([FromBody] CompanyAddDto company) {
             //ApiController already did this, so this is not in need
             //if (company == null)
@@ -205,7 +223,7 @@ namespace Routine.Api.Controllers
                         companyName = parameters.CompanyName,
                         searchTerm = parameters.SearchTerm
                     });
-
+                case ResourceUriType.CurrentPage:
                 default:
                     return Url.Link(nameof(GetCompanies), new
                     {
@@ -245,6 +263,20 @@ namespace Routine.Api.Controllers
             links.Add(new LinkDto(Url.Link(nameof(EmployeesController.GetEmployeesForCompany), new { companyId }),
                            "get_employees_for_company", "GET"));
             return links;
+        }
+
+        private IEnumerable<LinkDto> CreateLinksForCompany(CompanyDtoParameters parameters, bool hasPrevious, bool hasNext) {
+            var links = new List<LinkDto>();
+
+            links.Add(new LinkDto(CreateCompaniesResourceUri(parameters, ResourceUriType.CurrentPage), "self", "GET"));
+
+            if(hasPrevious)
+                links.Add(new LinkDto(CreateCompaniesResourceUri(parameters, ResourceUriType.PreviousPage), "previous_page", "GET"));
+
+            if(hasNext)
+                links.Add(new LinkDto(CreateCompaniesResourceUri(parameters, ResourceUriType.NextPage), "next_page", "GET"));
+            return links;
+        
         }
     }
 }
